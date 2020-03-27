@@ -592,16 +592,15 @@ Only search the range between just after the point and BOUND."
 
 (defun link-hint--help-link-at-point-p ()
   "Return the name of the help link at the point or nil."
-  (let ((help-link (get-text-property (point) 'help-args)))
-    (when help-link
-      (format "%s" help-link))))
+  (when (get-text-property (point) 'help-args)
+    (point)))
 
 (link-hint-define-type 'help-link
   :next #'link-hint--next-help-link
   :at-point-p #'link-hint--help-link-at-point-p
   :vars '(help-mode)
   :open #'push-button
-  :copy #'kill-new)
+  :describe #'ignore)
 
 ;; ** Info Link
 (defun link-hint--next-info-link (&optional bound)
