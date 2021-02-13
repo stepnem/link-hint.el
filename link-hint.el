@@ -275,15 +275,9 @@ Only search the range between just after the point and BOUND."
 
 (defun link-hint--text-url-at-point-p ()
   "Return the text url at the point or nil."
-  ;; using both thingatpt and url-util because:
-  ;; - thing-at-point won't detect e.g. www.google.com (https needed)
-  ;; - thing-at-point can correctly handle a url surrounded by parens
-  ;; - url-util won't detect a url that has an open paren before it
-  (let ((url (or (thing-at-point 'url)
-                 (url-get-url-at-point))))
-    (and url
-         (string-match link-hint-url-regexp url)
-         (match-string 0 url))))
+  (when-let ((url (thing-at-point 'url)))
+    (string-match link-hint-url-regexp url)
+    (match-string 0 url)))
 
 (defun link-hint--process-url (url _action)
   "Return URL without any trailing parentheses."
@@ -393,14 +387,14 @@ Only search the range between just after the point and BOUND."
   (plist-get (get-text-property (point) 'htmlize-link) :uri))
 
 (declare-function org-open-at-point "org")
-(declare-function org-open-link-from-string "org")
+(declare-function org-link-open-from-string "org")
 (defun link-hint--open-org-link (uri)
   "Open the org link URI."
   ;; org-open-at-point won't work e.g. for =http://address.com= even
   ;; though `org-next-link' will jump to it
   (condition-case nil
       (org-open-at-point)
-    (error (org-open-link-from-string uri))))
+    (error (org-link-open-from-string uri))))
 
 (link-hint-define-type 'org-link
   :next #'link-hint--next-org-link
@@ -410,6 +404,10 @@ Only search the range between just after the point and BOUND."
   :copy #'kill-new)
 
 ;; ** Treemacs Link
+(declare-function treemacs-button-get "treemacs")
+(declare-function treemacs-node-at-point "treemacs")
+(declare-function treemacs-visit-node-default "treemacs")
+(declare-function treemacs-visit-node-in-most-recently-used-window "treemacs")
 (defun link-hint--open-treemacs-button ()
   "Open an entry in a treemacs buffer."
   (if (string-prefix-p " *Treemacs-" (buffer-name))
@@ -436,6 +434,9 @@ Only search the range between just after the point and BOUND."
   :copy #'link-hint--copy-treemacs)
 
 ;; ** Markdown Link
+(declare-function markdown-follow-link-at-point "markdown-mode" ())
+(declare-function markdown-follow-wiki-link "markdown-mode"
+                  (name &optional other))
 (declare-function markdown-next-link "markdown-mode")
 (defun link-hint--next-markdown-link (&optional bound)
   "Find the next markdown link.
@@ -700,6 +701,7 @@ Only search the range between just after the point and BOUND."
   "Return the compilation link message at the point or nil."
   (get-text-property (point) 'compilation-message))
 
+(declare-function compile-goto-error "compile" (&optional event))
 (link-hint-define-type 'compilation-link
   :next #'link-hint--next-compilation-link
   :at-point-p #'link-hint--compilation-link-at-point-p
@@ -763,6 +765,7 @@ Only search the range between just after the point and BOUND."
   :copy #'kill-new)
 
 ;; ** Nov.el Link
+(declare-function nov-browse-url "nov")
 (defun link-hint--nov-browse ()
   "Call `nov-browse-url' with no args."
   (nov-browse-url))
@@ -775,6 +778,7 @@ Only search the range between just after the point and BOUND."
   :copy #'kill-new)
 
 ;; ** Customize Widget
+(declare-function Custom-newline "cus-edit" (pos &optional event))
 (defun link-hint--next-customize-widget (&optional bound)
   "Find the next package customize widget.
 Only search the range between just after the point and BOUND."
@@ -936,7 +940,7 @@ return it."
             (not avy-single-candidate-jump))
         (save-selected-window
           (let* ((avy-action #'identity)
-                 (pos (avy--process
+                 (pos (avy-process
                        (mapcar (lambda (x) (cons (plist-get x :pos)
                                                  (plist-get x :win)))
                                links)
