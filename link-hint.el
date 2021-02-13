@@ -1,4 +1,4 @@
-;;; link-hint.el --- Use avy to open, copy, etc. visible links. -*- lexical-binding: t -*-
+;;; link-hint.el --- use avy to act on visible links. -*- lexical-binding: t -*-
 
 ;; Author: Fox Kiester <noct@posteo.net>
 ;; URL: https://github.com/noctuid/link-hint.el
@@ -22,15 +22,17 @@
 ;; along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-;; This packages provides commands for operating on visible links with avy. It
-;; is inspired by link hinting from vim-like browsers and browser plugins such
-;; as pentadactyl. For example, `link-hint-open-link' will use avy to select and
-;; open a visible link. A link is not limited to a url but can also be a file
-;; link, button, org link, info link, help link, mu4e attachment, mailto
-;; address, etc. Commands are also provided for copying links to the kill ring
-;; (and optionally the clipboard and/or primary) and for opening multiple links
-;; at once like with pentadactyl's "g;" or qutebrowser's "--rapid" flag. It is
-;; possible for the user to add both new link types and new link actions.
+;; This packages provides commands for operating on visible links with
+;; avy.  It is inspired by link hinting from vim-like browsers and
+;; browser plugins such as pentadactyl.  For example,
+;; `link-hint-open-link' will use avy to select and open a visible
+;; link.  A link is not limited to a url but can also be a file link,
+;; button, org link, info link, help link, mu4e attachment, mailto
+;; address, etc.  Commands are also provided for copying links to the
+;; kill ring (and optionally the clipboard and/or primary) and for
+;; opening multiple links at once like with pentadactyl's "g;" or
+;; qutebrowser's "--rapid" flag.  It is possible for the user to add
+;; both new link types and new link actions.
 
 ;; For more information, see the link-hint.el README/documentation.
 
@@ -94,14 +96,16 @@
 (defcustom link-hint-url-regexp
   goto-address-url-regexp
   "Regexp used to determine what constitutes a text url.
-Defaults to `goto-address-url-regxp'. Note that this is used for text urls in
-modes that don't have some mechanism for supporting urls. This won't affect
+Defaults to `goto-address-url-regxp'.  Note that this is used for text urls in
+modes that don't have some mechanism for supporting urls.  This won't affect
 link-hint's behavior in `org-mode' or modes that use shr.el for urls, for
 example."
   :type 'regexp)
 
 (defcustom link-hint-maybe-file-regexp
-  (rx (or bol blank) (zero-or-one (or "~" (seq (char alpha) ":"))) "/" (1+ not-newline))
+  (rx (or bol blank)
+      (zero-or-one (or "~" (seq (char alpha) ":")))
+      "/" (1+ not-newline))
   "Regexp used to determine what constitutes a potential file link."
   :type 'regexp)
 
@@ -113,10 +117,11 @@ See issue #15 for more information."
 
 (defcustom link-hint-restore t
   "Whether to restore the point and window after opening a link.
-Note that the point will never be restored if the action intentionally moves the
-point within the link buffer (e.g. opening a local org heading link). Similarly,
-the window will never be restored if the action intentionally opens/selects a
-new window (e.g. opening a url in `eww')."
+Note that the point will never be restored if the action
+intentionally moves the point within the link
+buffer (e.g. opening a local org heading link).  Similarly, the
+window will never be restored if the action intentionally
+opens/selects a new window (e.g. opening a url in `eww')."
   :type 'boolean)
 
 ;; ** Avy Settings
@@ -153,7 +158,7 @@ Only search the range between just after the point and BOUND."
 
 (declare-function widget-forward "wid-edit")
 (defun link-hint--next-widget (&optional bound)
-  "Find the next widget location. Currently only used for custom mode.
+  "Find the next widget location.  Currently only used for custom mode.
 Only search the range between just after the point and BOUND."
   (setq bound (or bound (window-end)))
   (save-excursion
@@ -166,7 +171,7 @@ Only search the range between just after the point and BOUND."
 (defun link-hint--find-property-with-value
     (property value &optional start-bound end-bound)
   "Find the first location where PROPERTY has VALUE.
-If VALUE is nil, find the first location where PROPERTY exists. Only search the
+If VALUE is nil, find the first location where PROPERTY exists.  Only search the
 range from between just after the START-BOUND and END-BOUND."
   (let ((start-bound (or start-bound (window-start)))
         (end-bound (or end-bound (window-end)))
@@ -959,8 +964,8 @@ return it."
 (defun link-hint--apply (func args &optional parser action)
   "Try to call FUNC with ARGS.
 If PARSER is specified, first change ARGS by passing PARSER ARGS and ACTION.
-First try `apply'. If there is an error (ARGS is the wrong number of arguments
-for FUNC), `funcall' FUNC with ARGS. Finally, call FUNC alone."
+First try `apply'.  If there is an error (ARGS is the wrong number of arguments
+for FUNC), `funcall' FUNC with ARGS.  Finally, call FUNC alone."
   (when parser
     (setq args (funcall parser args action)))
   (condition-case nil
@@ -970,8 +975,8 @@ for FUNC), `funcall' FUNC with ARGS. Finally, call FUNC alone."
 (defun link-hint--message (action &optional link-description type)
   "Display a message about an ACTION performed on a link.
 `link-hint-message' holds the function to use to message (or is nil if there
-should be no messaging). LINK-DESCRIPTION can either be a number corresponding
-to the number of links acted upon or a description of a single link. Custom
+should be no messaging).  LINK-DESCRIPTION can either be a number corresponding
+to the number of links acted upon or a description of a single link.  Custom
 messages for ACTION can be created by altering `link-hint-action-messages' or
 adding an :<action>-message property to the link TYPE."
   (when link-hint-message
