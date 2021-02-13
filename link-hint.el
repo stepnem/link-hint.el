@@ -76,7 +76,6 @@
     link-hint-text-url
     link-hint-file-link)
   "Link types to check for."
-  :group 'link-hint
   :type '(repeat :tag "Link type" symbol))
 
 (defcustom link-hint-action-messages
@@ -84,12 +83,10 @@
     :open "Opened"
     :browse-url "Browsed")
   "Plist of action to description message pairs."
-  :group 'link-hint
   :type 'list)
 
 (defcustom link-hint-message #'message
   "The funtion to use to message information or nil."
-  :group 'link-hint
   :type '(choice
           (function :tag "Function to use to message")
           (const :tag "Don't message" nil)))
@@ -101,20 +98,17 @@ Defaults to `goto-address-url-regxp'. Note that this is used for text urls in
 modes that don't have some mechanism for supporting urls. This won't affect
 link-hint's behavior in `org-mode' or modes that use shr.el for urls, for
 example."
-  :group 'link-hint
   :type 'regexp)
 
 (defcustom link-hint-maybe-file-regexp
   (rx (or bol blank) (zero-or-one (or "~" (seq (char alpha) ":"))) "/" (1+ not-newline))
   "Regexp used to determine what constitutes a potential file link."
-  :group 'link-hint
   :type 'regexp)
 
 (defcustom link-hint-delete-trailing-paren t
   "Whether to delete a ) at the end of a url.
 This is a workaround for Emacs libraries including unwanted parens in urls.
 See issue #15 for more information."
-  :group 'link-hint
   :type 'boolean)
 
 (defcustom link-hint-restore t
@@ -123,7 +117,6 @@ Note that the point will never be restored if the action intentionally moves the
 point within the link buffer (e.g. opening a local org heading link). Similarly,
 the window will never be restored if the action intentionally opens/selects a
 new window (e.g. opening a url in `eww')."
-  :group 'link-hint
   :type 'boolean)
 
 ;; ** Avy Settings
