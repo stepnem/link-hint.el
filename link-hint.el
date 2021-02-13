@@ -88,7 +88,7 @@
   :type 'list)
 
 (defcustom link-hint-message #'message
-  "The funtion to use to message information or nil."
+  "The function to use to message information or nil."
   :type '(choice
           (function :tag "Function to use to message")
           (const :tag "Don't message" nil)))
