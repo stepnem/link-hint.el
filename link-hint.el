@@ -102,10 +102,10 @@ link-hint's behavior in `org-mode' or modes that use shr.el for urls, for
 example."
   :type 'regexp)
 
+(rx-define link-hint-file-boundary (* (any blank ?\" ?< ?>)))
 (defcustom link-hint-maybe-file-regexp
-  (rx (or bol blank)
-      (zero-or-one (or "~" (seq (char alpha) ":")))
-      "/" (1+ not-newline))
+  (rx link-hint-file-boundary
+      (? (or "~" (seq (char alpha) ":"))) "/" (+ not-newline))
   "Regexp used to determine what constitutes a potential file link."
   :type 'regexp)
 
@@ -317,8 +317,8 @@ Only search the range between just after START-BOUND and END-BOUND."
                                             (point) end-bound))
               (progn
                 (goto-char file-link-pos)
-                (when (looking-at (rx blank))
-                  (forward-char)
+                (when (re-search-forward (rx link-hint-file-boundary)
+                                         end-bound t)
                   (setq file-link-pos (point)))
                 t)
               (not (ffap-file-at-point))))
